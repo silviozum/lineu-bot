@@ -2,16 +2,57 @@
 const axios = require('axios');
 const Discord = require('discord.js');
 const bot = new Discord.Client();
-const TOKEN = 'NzAyNjgxNjY3MDI5OTU4Nzk2.XqDlpg.68kUaVmwftkBtNuTKngml0jH5yE';
+const TOKEN = 'NzAyNjgxNjY3MDI5OTU4Nzk2.Xw5Cvg.Ve5CEkgFK_RUwP9Dh3mg2uOf06Q';
 const { remote } = require('webdriverio');
-
 const discordTTS = require("discord-tts");
+const accountServiceLol = require('./_services/lol.service.js')
 
 bot.login(TOKEN);
 
 bot.on('ready', () => {
 	console.info(`Logged in as ${bot.user.tag}!`);
 });
+
+
+
+async function lolziba () {
+  const accountLol = await accountServiceLol.getAccountLol()
+  const getMatch = await accountServiceLol.matchList(accountLol)
+  const dailyGames = []
+  const stats = []
+  const result = []
+  const match = getMatch.map(async function(i, index) {
+    if (index < 2) {
+	  const getPostMatch = await accountServiceLol.postMatch(i.gameId)
+	  result.push(getPostMatch)
+	}
+	return result 
+  })
+
+  Promise.all(match).then((match) => {
+	match.map(function (p) {
+		
+	})
+  });
+
+}
+
+
+
+lolziba()
+// stats = postMatch.filter(function(o, index) {
+// 	if (i.champion === o.championId) {
+// 	  return o.stats
+// 	}
+//   })
+
+// dailyGames.push({
+// 	id: index,
+// 	kills: o.stats.kills,
+// 	deaths: o.stats.deaths,
+// 	assists: o.stats.assists,
+// 	championId: i.champion
+// })
 
 bot.on('message', msg => {
 	const voiceChannel = msg.member.voiceChannel;
@@ -36,6 +77,9 @@ bot.on('message', msg => {
 			tts: true
 		})
 	
+	}
+	if (msg.content === '/lineu disco') {
+		msg.channel.send('-p https://open.spotify.com/playlist/1OcktR3dDJKoTwZGRflm6h')
 	}
 
 	if (msg.content === '/cupuaçu') {
@@ -104,16 +148,30 @@ bot.on('message', msg => {
 		})().catch((e) => console.error(e))
 	}
 
-	if(msg.content==="/lineu fala"){
-		
-		const broadcast = bot.createVoiceBroadcast();
-        var channelId=msg.member.voiceChannelID;
-		var channel=bot.channels.get(channelId);
-		
-        channel.join().then(connection => {
-            broadcast.playStream(discordTTS.getVoiceStream("valoranto jogo merda", lang="it-IT"));
-            const dispatcher=connection.playBroadcast(broadcast);
-        });
-    }
+	if(msg.content.startsWith('/lolzinho')){
+		console.log('pora')
+		let lolUser = msg.content.split('/lolzinho ')
+		lolUser = lolUser[1]
+		const exampleEmbed = new Discord.MessageEmbed()
+		.setColor('#0099ff')
+		.setTitle('Some title')
+		.setURL('https://discord.js.org/')
+		.setAuthor('Some name', 'https://i.imgur.com/wSTFkRM.png', 'https://discord.js.org')
+		.setDescription('Some description here')
+		.setThumbnail('https://i.imgur.com/wSTFkRM.png')
+		.addFields(
+			{ name: 'Regular field title', value: 'Some value here' },
+			{ name: '\u200B', value: '\u200B' },
+			{ name: 'Inline field title', value: 'Some value here', inline: true },
+			{ name: 'Inline field title', value: 'Some value here', inline: true },
+		)
+		.addField('Inline field title', 'Some value here', true)
+		.setImage('https://i.imgur.com/wSTFkRM.png')
+		.setTimestamp()
+		.setFooter('Some footer text here', 'https://i.imgur.com/wSTFkRM.png');
+
+		msg.send(exampleEmbed);
+
+	}
 
 });
